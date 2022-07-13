@@ -2,6 +2,7 @@ package com;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,17 +15,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.my.sql.MyConnection;
 
+
 /**
  * Servlet implementation class Connection
  */
 @WebServlet("/Connection")
-public class Connection extends HttpServlet {
+public class gameConnection extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
     /**
      * Default constructor. 
      */
-    public Connection() {
+    public gameConnection() {
         // TODO Auto-generated constructor stub
     }
 
@@ -36,21 +38,23 @@ public class Connection extends HttpServlet {
 //		response.getWriter().append("Served at: ").append(request.getContextPath());
 //		String id = request.getParameter("id");	
 		
-		String result = "{\"status\":0, \"msg\" : \"이미 사용중인 아이디입니다 \"}";
-			
+		String result = null;
 		//DB연결
 		Connection con = null;
 		PreparedStatement pstmt =null;
 		ResultSet rs =null;
 		
-		String selectIdDubChkSQL = "SELECT * FROM customer WHERE id = ?";
+		String selectGameIndex = "SELECT q.question_name \r\n"
+				+ "FROM question q JOIN choice d ON (q.question_num = d.question_num)\r\n"
+				+ "WHERE q.question_num in 1";
 		try {
 			con = MyConnection.getConnection();
-			pstmt = con.prepareStatement(selectIdDubChkSQL);
-			pstmt.setString(1,id);
+			pstmt = con.prepareStatement(selectGameIndex);
+//			pstmt.setString(1,id);
 			rs=pstmt.executeQuery();
 			if(!rs.next()) {
 				result = "{\"status\":1, \"msg\" : \"사용 가능한 아이디입니다\"}";
+			
 			}
 			}catch (SQLException e) {
 				e.printStackTrace();
@@ -64,6 +68,6 @@ public class Connection extends HttpServlet {
 			out.print(result);
 		}
 
-	}
+	
 
 }
